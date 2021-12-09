@@ -11,8 +11,8 @@ export class ShirtsSetFactory {
 
     getDifferentShirtSetWithMaxTotalDiscount(basketItems: BasketItem[]): ShirtsSet[] {
 
-        const differentShirtsSetsCombinations: any[][] = [];
-        
+        const differentShirtsSetsCombinations: any[] = [];
+
         for (let i = basketItems.length; i >= 1; i--) {
             differentShirtsSetsCombinations.push(this.calculateDifferentShirtsSetsBySize(basketItems, i));
         }
@@ -47,20 +47,26 @@ export class ShirtsSetFactory {
         return basketItemsCopy;
     }
     createNextSet(remainingBasketItems: BasketItem[], maxSizeSet: number): ShirtsSet {
-        const shirts = new Set<Shirt>();
-        for(let itemIndex = 0; itemIndex < remainingBasketItems.length; itemIndex++) {
-            shirts.add(remainingBasketItems[itemIndex].getShirt());
-            if(shirts.size > maxSizeSet) {
+         
+        const shirts: Set<Shirt> = new Set();
+        let itemIndex = remainingBasketItems.length-1;
+        while(remainingBasketItems.length!= 0) {
+            shirts.add(remainingBasketItems[itemIndex]?.getShirt());
+            if(shirts.size == maxSizeSet) {
+                remainingBasketItems.splice(itemIndex, 1);
                 break;
             }
+
             if(remainingBasketItems[itemIndex].getQuantity() ==1) {
-                console.log('should splice');
+
                 remainingBasketItems.splice(itemIndex, 1);
+                itemIndex--;
             } else {
                 remainingBasketItems[itemIndex].changeQuantity(remainingBasketItems[itemIndex].getQuantity() -1);
+                
             }
         }
-        const shirtsSet: ShirtsSet = new ShirtsSet(shirts, this.getDiscount(shirts.size))
+        const shirtsSet: ShirtsSet = new ShirtsSet(new Set(shirts), this.getDiscount(shirts.size))
         return shirtsSet;
     
     }
@@ -81,11 +87,11 @@ export class ShirtsSetFactory {
 
         let maxShirtsSetDiscount = 0;
         let totalShirtsSetDiscount = 0;
-        // console.log('shirtsSetCombination', shirtsSetCombination);
+
         for (const shirtsSet of shirtsSetCombination) {
-            // console.log('shirtsSet', shirtsSet);
+
             for(const set of shirtsSet) {
-                // console.log('setshirts', set.getShirts());
+                
                 totalShirtsSetDiscount += set.getDiscount();
             }
             

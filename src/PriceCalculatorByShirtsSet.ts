@@ -12,22 +12,27 @@ export class PriceCalculatorByShirtsSet {
     calculate(basketItems: BasketItem[]) {
         // console.log('calculating', basketItems);
         const setsOfDifferentShirts = this.shirtsSetFactory.getDifferentShirtSetWithMaxTotalDiscount(basketItems);
-        // console.log('setsOfDifferentShirts', setsOfDifferentShirts);
+        
         let totalPrice = 0.0;
-        let setPrice = 0.0;
+        let shirtsSetPrice = 0.0;
         if(setsOfDifferentShirts) {
             setsOfDifferentShirts.forEach((shirtsSet) => {
-            
-                for(const shirt of shirtsSet.getShirts()) {
-                    setPrice += shirt.getPrice();
+                
+                for(const shirt of shirtsSet.getShirts()) { 
+                    shirtsSetPrice += shirt.getPrice();
+                    if(setsOfDifferentShirts.length == 1) {
+                        const shirtType = shirt.getType();
+                        const basketShirt = basketItems.filter((item) => item.getShirt().getType() == shirtType);
+                        shirtsSetPrice = shirtsSetPrice * basketShirt[0].getQuantity() 
+
+                    }
                 }
-                setPrice = setPrice * (1.0 - shirtsSet.getDiscount()/100.0);
-                totalPrice +=setPrice;
-                setPrice = 0;
+                shirtsSetPrice = shirtsSetPrice * (1.0 - shirtsSet.getDiscount()/100.0);
+                totalPrice +=shirtsSetPrice;
+                shirtsSetPrice = 0;
             });
         }
         
-        console.log('totalPrice', totalPrice);
         return totalPrice;
     }
 }
